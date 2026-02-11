@@ -31,6 +31,7 @@ class LiteLLMProvider(LLMProvider):
         super().__init__(api_key, api_base)
         self.default_model = default_model
         self.extra_headers = extra_headers or {}
+        self.provider_name = provider_name
         
         # Detect gateway / local deployment.
         # provider_name (from config key) is the primary signal;
@@ -81,6 +82,12 @@ class LiteLLMProvider(LLMProvider):
                 model = f"{prefix}/{model}"
             return model
         
+        # OpenAI-compatible endpoints often use non-gpt model names (e.g. "ecnu-plus").
+        # When the selected provider config is "openai", ensure LiteLLM sees an explicit
+        # provider prefix so it can route the request correctly.
+        if self.provider_name == "openai" and "/" not in model:
+            model = f"openai/{model}"
+
         # Standard mode: auto-prefix for known providers
         spec = find_by_model(model)
         if spec and spec.litellm_prefix:
@@ -128,6 +135,11 @@ class LiteLLMProvider(LLMProvider):
             "max_tokens": max_tokens,
             "temperature": temperature,
         }
+
+        # Some OpenAI-compatible third-party endpoints use non-standard model names.
+        # LiteLLM can occasionally mis-infer provider from model/base; force it.
+        if self.provider_name == "openai" and self.api_base:
+            kwargs["custom_llm_provider"] = "openai"
         
         # Apply model-specific overrides (e.g. kimi-k2.5 temperature)
         self._apply_model_overrides(model, kwargs)
