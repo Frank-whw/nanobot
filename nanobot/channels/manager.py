@@ -141,6 +141,18 @@ class ChannelManager:
                 logger.info("QQ channel enabled")
             except ImportError as e:
                 logger.warning(f"QQ channel not available: {e}")
+
+        # WS Agent channel
+        if self.config.channels.ws_agent.enabled:
+            try:
+                from nanobot.channels.ws_agent import WSAgentChannel
+                self.channels["ws_agent"] = WSAgentChannel(
+                    self.config.channels.ws_agent,
+                    self.bus,
+                )
+                logger.info("WS agent channel enabled")
+            except ImportError as e:
+                logger.warning(f"WS agent channel not available: {e}")
     
     async def _start_channel(self, name: str, channel: BaseChannel) -> None:
         """Start a channel and log any exceptions."""
