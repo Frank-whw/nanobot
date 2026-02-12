@@ -18,7 +18,7 @@ def build_tenant_router_if_enabled(
     default_data_dir: Path,
 ) -> TenantRuntimeRouter | None:
     """Build tenant router when extension flag is enabled."""
-    cfg = TenantRuntimeConfig.from_env(default_root=default_data_dir / "tenants")
+    cfg = TenantRuntimeConfig.from_env(default_root=default_data_dir)
     if not cfg.enabled:
         return None
     return TenantRuntimeRouter(

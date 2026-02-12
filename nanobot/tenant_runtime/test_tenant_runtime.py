@@ -52,7 +52,7 @@ def test_tenant_context_from_inbound() -> None:
     assert ctx.channel == "web"
     assert ctx.thread_id == "th-1"
     assert build_isolation_key(ctx) == "tenant-a:user-a:web:th-1"
-    assert build_runtime_key(ctx) == "tenant-a:user-a:project-a"
+    assert build_runtime_key(ctx) == "tenant-a:user-a"
 
 
 @pytest.mark.asyncio
@@ -75,7 +75,7 @@ async def test_per_key_scheduler_serializes_same_key() -> None:
 
 
 def test_path_resolver_isolation(tmp_path: Path) -> None:
-    resolver = TenantPathResolver(root=tmp_path / "tenants")
+    resolver = TenantPathResolver(root=tmp_path)
     msg_a = InboundMessage(
         channel="web",
         sender_id="u1",
@@ -93,6 +93,8 @@ def test_path_resolver_isolation(tmp_path: Path) -> None:
     ctx_a = TenantContext.from_inbound(msg_a)
     ctx_b = TenantContext.from_inbound(msg_b)
 
+    assert resolver.tenant_root(ctx_a).name == "tenants_t1"
+    assert resolver.user_root(ctx_a).name == "users_u1"
     assert resolver.workspace_dir(ctx_a) != resolver.workspace_dir(ctx_b)
     assert resolver.sessions_dir(ctx_a) != resolver.sessions_dir(ctx_b)
     assert resolver.cron_store_path(ctx_a) != resolver.cron_store_path(ctx_b)

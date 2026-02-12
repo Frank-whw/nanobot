@@ -6,7 +6,7 @@ This document describes the tenant runtime extension for single-process multi-us
 
 - Per-conversation serial execution using `isolationKey`.
 - Global concurrency limits to protect the process.
-- Per-tenant/user/project storage buckets for:
+- Per-tenant/user storage buckets for:
   - workspace
   - sessions
   - cron store
@@ -19,7 +19,6 @@ Inbound metadata supports these fields:
 - Required in production:
   - `tenantId` (or `tenant_id`)
   - `userId` (or `user_id`)
-  - `projectId` (or `project_id`)
   - `threadId` (or `thread_id`)
   - `requestId` (or `request_id`)
   - `timestamp` (ISO8601 recommended)
@@ -30,7 +29,6 @@ Inbound metadata supports these fields:
 If missing, defaults are applied:
 
 - `tenant_id = "default"`
-- `project_id = "default"`
 - `user_id = sender_id`
 - `thread_id = chat_id`
 
@@ -40,19 +38,19 @@ If missing, defaults are applied:
 
 Runtime bucket key:
 
-`runtimeKey = tenantId:userId:projectId`
+`runtimeKey = tenantId:userId`
 
 ## Storage Layout
 
 Root directory (default):
 
-`~/.nanobot/tenants`
+`~/.nanobot`
 
-Per project:
+Per user:
 
-- `~/.nanobot/tenants/{tenant}/users/{user}/projects/{project}/workspace`
-- `~/.nanobot/tenants/{tenant}/users/{user}/projects/{project}/sessions`
-- `~/.nanobot/tenants/{tenant}/users/{user}/projects/{project}/cron/jobs.json`
+- `~/.nanobot/tenants_{tenant}/users_{user}/workspace`
+- `~/.nanobot/tenants_{tenant}/users_{user}/sessions`
+- `~/.nanobot/tenants_{tenant}/users_{user}/cron/jobs.json`
 
 ## Enable
 
@@ -60,7 +58,7 @@ Set environment variables before starting `nanobot gateway`:
 
 ```bash
 export NANOBOT_TENANT_RUNTIME_ENABLED=true
-export NANOBOT_TENANT_ROOT="$HOME/.nanobot/tenants"
+export NANOBOT_TENANT_ROOT="$HOME/.nanobot"
 export NANOBOT_TENANT_MAX_GLOBAL=8
 export NANOBOT_TENANT_PER_KEY_LIMIT=50
 export NANOBOT_TENANT_TASK_TIMEOUT_S=60

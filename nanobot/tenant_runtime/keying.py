@@ -11,4 +11,4 @@ def build_isolation_key(ctx: TenantContext) -> str:
 
 def build_runtime_key(ctx: TenantContext) -> str:
     """Per-runtime key (agent/workspace/session bucket)."""
-    return f"{ctx.tenant_id}:{ctx.user_id}:{ctx.project_id}"
+    return f"{ctx.tenant_id}:{ctx.user_id}"

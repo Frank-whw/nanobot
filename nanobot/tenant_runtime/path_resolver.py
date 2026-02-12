@@ -15,13 +15,16 @@ class TenantPathResolver:
         self.root = ensure_dir(root)
 
     def tenant_root(self, ctx: TenantContext) -> Path:
-        return ensure_dir(self.root / safe_filename(ctx.tenant_id))
+        tenant = safe_filename(ctx.tenant_id)
+        return ensure_dir(self.root / f"tenants_{tenant}")
 
     def user_root(self, ctx: TenantContext) -> Path:
-        return ensure_dir(self.tenant_root(ctx) / "users" / safe_filename(ctx.user_id))
+        user = safe_filename(ctx.user_id)
+        return ensure_dir(self.tenant_root(ctx) / f"users_{user}")
 
     def project_root(self, ctx: TenantContext) -> Path:
-        return ensure_dir(self.user_root(ctx) / "projects" / safe_filename(ctx.project_id))
+        # Keep method for compatibility; storage layout no longer nests by project.
+        return self.user_root(ctx)
 
     def workspace_dir(self, ctx: TenantContext) -> Path:
         return ensure_dir(self.project_root(ctx) / "workspace")
