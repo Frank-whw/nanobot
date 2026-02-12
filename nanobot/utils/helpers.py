@@ -10,12 +10,12 @@ def ensure_dir(path: Path) -> Path:
     return path
 
 
-def get_data_path() -> Path:
+def get_data_path(base_dir: Path | None = None) -> Path:
     """Get the nanobot data directory (~/.nanobot)."""
-    return ensure_dir(Path.home() / ".nanobot")
+    return ensure_dir(base_dir or (Path.home() / ".nanobot"))
 
 
-def get_workspace_path(workspace: str | None = None) -> Path:
+def get_workspace_path(workspace: str | None = None, base_dir: Path | None = None) -> Path:
     """
     Get the workspace path.
     
@@ -28,13 +28,14 @@ def get_workspace_path(workspace: str | None = None) -> Path:
     if workspace:
         path = Path(workspace).expanduser()
     else:
-        path = Path.home() / ".nanobot" / "workspace"
+        root = base_dir or (Path.home() / ".nanobot")
+        path = root / "workspace"
     return ensure_dir(path)
 
 
-def get_sessions_path() -> Path:
+def get_sessions_path(base_dir: Path | None = None) -> Path:
     """Get the sessions storage directory."""
-    return ensure_dir(get_data_path() / "sessions")
+    return ensure_dir(get_data_path(base_dir=base_dir) / "sessions")
 
 
 def get_memory_path(workspace: Path | None = None) -> Path:
