@@ -96,10 +96,10 @@ class MemoryStore:
         """
         parts = []
         
-        # Long-term memory
+        # Workspace-scoped memory
         long_term = self.read_long_term()
         if long_term:
-            parts.append("## Long-term Memory\n" + long_term)
+            parts.append("## Workspace Memory\n" + long_term)
         
         # Today's notes
         today = self.read_today()

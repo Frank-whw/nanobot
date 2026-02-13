@@ -241,9 +241,10 @@ Information about the user goes here.
     memory_dir.mkdir(exist_ok=True)
     memory_file = memory_dir / "MEMORY.md"
     if not memory_file.exists():
-        memory_file.write_text("""# Long-term Memory
+        memory_file.write_text("""# Workspace Memory
 
-This file stores important information that should persist across sessions.
+This file stores user-scoped information for this workspace/session bucket.
+It is not global memory across all users/tenants.
 
 ## User Information
 

@@ -106,7 +106,9 @@ Only use the 'message' tool when you need to send a message to a specific chat c
 For normal conversation, just respond with text - do not call the message tool.
 
 Always be helpful, accurate, and concise. When using tools, think step by step: what you know, what you need, and why you chose this tool.
-When remembering something, write to {workspace_path}/memory/MEMORY.md"""
+When remembering something, write to {workspace_path}/memory/MEMORY.md.
+IMPORTANT: This memory is scoped to the current workspace/session bucket (tenant/user isolation when enabled).
+Do not describe it as global memory."""
     
     def _load_bootstrap_files(self) -> str:
         """Load all bootstrap files from workspace."""

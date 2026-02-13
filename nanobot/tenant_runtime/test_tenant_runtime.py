@@ -93,7 +93,8 @@ def test_path_resolver_isolation(tmp_path: Path) -> None:
     ctx_a = TenantContext.from_inbound(msg_a)
     ctx_b = TenantContext.from_inbound(msg_b)
 
-    assert resolver.tenant_root(ctx_a).name == "tenants_t1"
+    assert resolver.tenant_root(ctx_a).name == "t1"
+    assert resolver.tenant_root(ctx_a).parent.name == "tenants"
     assert resolver.user_root(ctx_a).name == "users_u1"
     assert resolver.workspace_dir(ctx_a) != resolver.workspace_dir(ctx_b)
     assert resolver.sessions_dir(ctx_a) != resolver.sessions_dir(ctx_b)

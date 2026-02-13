@@ -16,7 +16,7 @@ class TenantPathResolver:
 
     def tenant_root(self, ctx: TenantContext) -> Path:
         tenant = safe_filename(ctx.tenant_id)
-        return ensure_dir(self.root / f"tenants_{tenant}")
+        return ensure_dir(self.root / "tenants" / tenant)
 
     def user_root(self, ctx: TenantContext) -> Path:
         user = safe_filename(ctx.user_id)

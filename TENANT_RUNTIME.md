@@ -48,9 +48,9 @@ Root directory (default):
 
 Per user:
 
-- `~/.nanobot/tenants_{tenant}/users_{user}/workspace`
-- `~/.nanobot/tenants_{tenant}/users_{user}/sessions`
-- `~/.nanobot/tenants_{tenant}/users_{user}/cron/jobs.json`
+- `~/.nanobot/tenants/{tenant}/users_{user}/workspace`
+- `~/.nanobot/tenants/{tenant}/users_{user}/sessions`
+- `~/.nanobot/tenants/{tenant}/users_{user}/cron/jobs.json`
 
 ## Enable
 
