@@ -446,6 +446,9 @@ Respond with ONLY valid JSON, no markdown fences."""
         session_key: str = "cli:direct",
         channel: str = "cli",
         chat_id: str = "direct",
+        sender_id: str = "user",
+        metadata: dict[str, Any] | None = None,
+        media: list[str] | None = None,
     ) -> str:
         """
         Process a message directly (for CLI or cron usage).
@@ -461,9 +464,11 @@ Respond with ONLY valid JSON, no markdown fences."""
         """
         msg = InboundMessage(
             channel=channel,
-            sender_id="user",
+            sender_id=sender_id,
             chat_id=chat_id,
-            content=content
+            content=content,
+            media=media or [],
+            metadata={"session_key": session_key, **(metadata or {})},
         )
         
         response = await self._process_message(msg, session_key=session_key)

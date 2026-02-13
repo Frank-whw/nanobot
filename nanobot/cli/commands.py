@@ -241,9 +241,10 @@ Information about the user goes here.
     memory_dir.mkdir(exist_ok=True)
     memory_file = memory_dir / "MEMORY.md"
     if not memory_file.exists():
-        memory_file.write_text("""# Long-term Memory
+        memory_file.write_text("""# Workspace Memory
 
-This file stores important information that should persist across sessions.
+This file stores user-scoped information for this workspace/session bucket.
+It is not global memory across all users/tenants.
 
 ## User Information
 
@@ -306,6 +307,7 @@ def gateway(
     from nanobot.cron.service import CronService
     from nanobot.cron.types import CronJob
     from nanobot.heartbeat.service import HeartbeatService
+    from nanobot.tenant_runtime.bootstrap import build_tenant_router_if_enabled
     
     if verbose:
         import logging
@@ -316,10 +318,42 @@ def gateway(
     config = load_config()
     bus = MessageBus()
     provider = _make_provider(config)
+    data_dir = get_data_dir()
+
+    tenant_router = build_tenant_router_if_enabled(
+        bus=bus,
+        provider=provider,
+        model=config.agents.defaults.model,
+        max_iterations=config.agents.defaults.max_tool_iterations,
+        brave_api_key=config.tools.web.search.api_key or None,
+        exec_config=config.tools.exec,
+        restrict_to_workspace=config.tools.restrict_to_workspace,
+        default_data_dir=data_dir,
+    )
+
+    if tenant_router:
+        channels = ChannelManager(config, bus, session_manager=None)
+        console.print("[green]✓[/green] Tenant runtime mode enabled")
+        console.print(f"[green]✓[/green] Channels enabled: {', '.join(channels.enabled_channels) if channels.enabled_channels else 'none'}")
+
+        async def run_tenant():
+            try:
+                await asyncio.gather(
+                    tenant_router.run(),
+                    channels.start_all(),
+                )
+            except KeyboardInterrupt:
+                console.print("\nShutting down...")
+                await tenant_router.stop()
+                await channels.stop_all()
+
+        asyncio.run(run_tenant())
+        return
+
     session_manager = SessionManager(config.workspace_path)
     
     # Create cron service first (callback set after agent creation)
-    cron_store_path = get_data_dir() / "cron" / "jobs.json"
+    cron_store_path = data_dir / "cron" / "jobs.json"
     cron = CronService(cron_store_path)
     
     # Create agent with cron service
@@ -569,6 +603,17 @@ def channels_status():
         "Slack",
         "✓" if slack.enabled else "✗",
         slack_config
+    )
+
+    # WS Agent
+    ws_agent = config.channels.ws_agent
+    ws_agent_config = f"ws://{ws_agent.host}:{ws_agent.port}"
+    if ws_agent.require_auth:
+        ws_agent_config += " (auth)"
+    table.add_row(
+        "WS Agent",
+        "✓" if ws_agent.enabled else "✗",
+        ws_agent_config
     )
 
     console.print(table)
