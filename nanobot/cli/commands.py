@@ -332,7 +332,7 @@ def gateway(
     )
 
     if tenant_router:
-        channels = ChannelManager(config, bus, session_manager=None)
+        channels = ChannelManager(config, bus)
         console.print("[green]✓[/green] Tenant runtime mode enabled")
         console.print(f"[green]✓[/green] Channels enabled: {', '.join(channels.enabled_channels) if channels.enabled_channels else 'none'}")
 
